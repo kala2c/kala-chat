@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+	<meta charset="UTF-8">
+	<title>聊天室</title>
+</head>
+<body>
+	<input type="text" id="data-input">
+    <button id="send-btn">发送</button>
+    <ul id="list">
+        <!-- <li class="list-group-item">
+            <p class="text"></p>
+        </li> -->
+    </ul>
+	<script>
+		// 监听数组变动
+		const arrayProto = Array.prototype;
+		const arrayMethods = Object.create(arrayProto);
+		const newArrayProto = [];
+		['push', 'pop', 'shift', 'unshift', 'splice', 'sort', 'reverse'].forEach(method => {
+			let orginal = arrayMethods[method];
+			//newArrayProto.__proto__
+			newArrayProto[method] = function mutator() {
+				updateMessage();
+				return orginal.apply(this, arguments);
+			}
+		})
+		// 获取页面元素
+		let list = document.querySelector('#list');
+		let dataInput = document.querySelector('#data-input');
+		let sendBtn = document.querySelector('#send-btn');
+		// 渲染视图
+		const updateMessage = () => {
+			list.innerHTML = "";
+			// list.childNodes.forEach(node => {
+			// 	node.remove();
+			// })
+			msg.forEach(item => {
+				let li = document.createElement('li');
+				let p = document.createElement('p');
+				p.innerText = item.user+":"+item.content;
+				li.setAttribute('class', 'list-group-item');
+				li.appendChild(p);
+				list.appendChild(li);
+			});
+		}
+		// 数组
+		msg = [];
+		msg.__proto__ = newArrayProto;
+		// 创建ws对象
+		let ws = new WebSocket("ws://localhost:8082/");
+		// 消息发送
+        sendBtn.addEventListener('click', () => {
+        	let data = dataInput.value;
+        	ws.send(data);
+        })
+        // 监听ws事件
+        ws.onopen = function() {
+            msg.push({
+                index: msg.length,
+                content: "连接成功",
+                user: "系统"
+            });
+        }
+        ws.onclose = function() {
+            msg.push({
+                index: msg.length,
+                content: "失去连接",
+                user: "系统"
+            });
+        }
+        ws.onmessage = function(e) {
+            console.log(e.data)
+            // msg.push({
+                // index: index,
+                // content: content,
+                // user: user
+            // });
+            msg.push(JSON.parse(e.data))
+        }
+	</script>
+</body>
+</html>

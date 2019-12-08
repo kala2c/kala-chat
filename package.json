@@ -1,0 +1,15 @@
+{
+  "name": "ws-server",
+  "version": "1.0.0",
+  "description": "一个ws服务 chat的后端",
+  "main": "index.js",
+  "dependencies": {
+    "nodejs-websocket": "^1.7.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "dev"
+  },
+  "author": "c2wei",
+  "license": "ISC"
+}
